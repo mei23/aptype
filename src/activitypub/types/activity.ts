@@ -46,9 +46,20 @@ export interface ILeave extends IActivity {
 export const isLeave = (activity: IActivity): activity is ILeave => activity.type === 'Leave';
 
 export interface ILike extends IActivity {
-	type: 'Like';
+	_misskey_reaction?: string;
 }
 export const isLike = (activity: IActivity): activity is ILike => activity.type === 'Like';
+
+export interface ILikeLike extends IActivity {
+	type: 'Like' | 'Dislike' | 'EmojiReaction' | 'EmojiReact';
+
+	/**
+	 * Misskeyのリアクション
+	 * contentにも同じ値が入ってるのでそっちを見ればいい
+	 * */
+	_misskey_reaction?: string;
+}
+export const isLikeLike = (activity: IActivity): activity is ILikeLike => ['Like', 'Dislike', 'EmojiReaction', 'EmojiReact'].includes(getApType(activity));
 
 export interface IOffer extends IActivity {
 	type: 'Offer';
@@ -130,12 +141,16 @@ export interface IDislike extends IActivity {
 }
 export const isDislike = (activity: IActivity): activity is IDislike => activity.type === 'Dislike';
 
+// これActivityじゃなくてObjectじゃないの？
+// closedにObjectやLinkが来たら何をすればいいの？
+// とか、なんかあやしい
+/*
 export interface IQuestion extends IActivity {
 	type: 'Question';
 	oneOf?: IObject | ApLink;
 	anyOf?: IObject | ApLink;
-	closed?: IObject | ApLink | Date | boolean;
+	closed?: IObject | ApLink | Date | boolean;	
 }
 export const isQuestion = (activity: IActivity): activity is IQuestion => activity.type === 'Question';
-
+*/
 

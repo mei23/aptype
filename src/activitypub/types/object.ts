@@ -1,4 +1,4 @@
-import { ApLink, IObject, ApJointObject, getApType } from "./core";
+import { ApLink, IObject, ApJointObject, getApType, ICollection } from "./core";
 
 export interface IRelationship extends IObject {
 	type: 'Relationship';
@@ -11,6 +11,13 @@ export const isRelationship = (object: IObject): object is IRelationship => getA
 
 export interface IDocumentLike extends IObject {
 	type: 'Document' | 'Audio' | 'Image' | 'Video' | 'Page';
+
+	// toot
+	// https://docs.joinmastodon.org/spec/activitypub/#blurhash
+	blurhash?: string;
+
+	// https://docs.joinmastodon.org/spec/activitypub/#focalPoint
+	focalPoint?: number[];
 }
 
 export const validDocuments = Object.freeze(['Document', 'Audio', 'Image', 'Video', 'Page']);
@@ -18,7 +25,30 @@ export const validDocuments = Object.freeze(['Document', 'Audio', 'Image', 'Vide
 export const isDocumentLike = (object: IObject): object is IDocumentLike => validDocuments.includes(getApType(object));
 
 export interface IPostLike extends IObject {
-	type: 'Article' | 'Note' | 'Event';
+	type: 'Article' | 'Note' | 'Event' | 'Question';
+
+	/** Misskey: Original MFM */
+	_misskey_content?: string;
+	/** Misskey: Quote target */
+	_misskey_quote?: ApLink;
+	
+	/**
+	 * Biwakodon: Quote target
+	 * https://github.com/wakin-/mastodon/pull/39
+	 */
+	quoteUrl?: ApLink;
+
+	// Mastodon/Misskey: Question
+	oneOf?: IQuestionChoice[];
+	anyOf?: IQuestionChoice[];
+	endTime?: Date;
+	closed?: Date;
+}
+
+interface IQuestionChoice {
+	name?: string;
+	replies?: ICollection;
+	_misskey_votes?: number;
 }
 
 export const validPosts = Object.freeze(['Article', 'Note', 'Event']);
@@ -51,3 +81,12 @@ export interface ITombstone extends IObject {
 }
 
 export const isTombstone = (object: IObject): object is ITombstone => getApType(object) === 'Tombstone';
+
+// https://docs.joinmastodon.org/spec/activitypub/#emoji
+export interface IEmoji extends IObject {
+	type: 'Emoji';
+	// name: ':name:'
+	// icon: Image
+}
+
+// toot:IdentityProof TODO

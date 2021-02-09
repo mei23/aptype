@@ -19,6 +19,16 @@ export interface IActor extends IObject {
 		owner?: string;
 		publicKeyPem?: string;
 	};
+
+	// toot
+	// https://docs.joinmastodon.org/spec/activitypub/#featured
+	featured?: IOrderedCollection | ICollection | ApLink;
+
+	// https://docs.joinmastodon.org/spec/activitypub/#featuredTags
+	featuredTags?: IOrderedCollection | ICollection | ApLink;
+
+	discoverable?: boolean;
+	suspended?: boolean;
 }
 
 export const validActors = Object.freeze(['Application', 'Group', 'Organization', 'Person', 'Service']);
