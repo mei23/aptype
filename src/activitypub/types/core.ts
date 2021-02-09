@@ -1,3 +1,5 @@
+import { IDocumentLike } from "./object";
+
 export type obj = { [x: string]: any };
 
 /** One or many Object or Link */
@@ -14,8 +16,8 @@ export interface IObject {
 	name?: string;
 	endTime?: Date;
 	generator?: ApJointObject;
-	icon?: IImage | ApLink;
-	image?: IImage | ApLink;
+	icon?: IDocumentLike | ApLink;
+	image?: IDocumentLike | ApLink;
 	inReplyTo?: ApJointObject;
 	location?: ApJointObject;
 	preview?: IObject | ApLink;
@@ -55,6 +57,16 @@ interface ILink extends ILinkBase {
 interface IMention extends ILinkBase {
 	type: 'Mention';
 };
+
+export const getApType = (object: IObject) => Array.isArray(object.type) ? object.type[0] : object.type;
+
+export const isObject = (object: IObject | ApLink): object is IObject => typeof(object) !== 'string' && getApType(object) !== 'Link';
+
+export const getApId = (object: IObject | ApLink) => {
+	const id = typeof object === 'string' ? object : isObject(object) ? object.id : object.href;
+	if (id == null) throw 'no id';
+	return id;
+}
 
 export interface IActivity extends IObject {
 	actor?: ApJointObject;
@@ -103,122 +115,25 @@ export interface ICollection extends ICollectionBase {
 	items?: (IObject | ApLink)[];
 }
 
+export const isCollection = (object: IObject): object is ICollection => object.type === 'Collection'
+
 export interface IOrderedCollection extends ICollectionBase {
 	type: 'OrderedCollection';
 	orderedItems?: (IObject | ApLink)[];
 }
+
+export const isOrderedCollection = (object: IObject): object is IOrderedCollection => object.type === 'OrderedCollection'
 
 export interface ICollectionPage extends ICollectionPageBase {
 	type: 'CollectionPage';
 	items?: (IObject | ApLink)[];
 }
 
+export const isCollectionPage = (object: IObject): object is ICollectionPage => object.type === 'CollectionPage'
+
 export interface IOrderedCollectionPage extends ICollectionPageBase {
 	type: 'OrderedCollectionPage';
 	orderedItems?: (IObject | ApLink)[];
 }
 
-
-
-
-
-
-
-
-
-
-
-
-// relationship
-
-//#region Document like
-export interface IDocument extends IObject {
-	type: 'Document';
-}
-
-export interface IAudio extends IObject {
-	type: 'Audio';
-}
-
-export interface IImage extends IObject {
-	type: 'Image';
-}
-
-export interface IVideo extends IObject {
-	type: 'Video';
-}
-
-export interface IPage extends IObject {
-	type: 'Page';
-}
-//#endregion
-
-//#region Post like
-export interface IArticle extends IObject {
-	type: 'Article';
-}
-
-export interface INote extends IObject {
-	type: 'Note';
-}
-
-export interface IEvent extends IObject {
-	type: 'Event';
-}
-//#endregion
-
-export interface IPlace extends IObject {
-	type: 'Place';
-	accuracy?: number;
-	altitude?: number;
-	latitude?: number;
-	longitude?: number;
-	/** units of  altitude*/
-	units?: 'cm' | 'feet' | 'inches' | 'km' | 'm' | 'miles';
-}
-
-export interface IProfile extends IObject {
-	type: 'Profile';
-	describes?: IObject;
-}
-
-export interface ITombstone extends IObject {
-	type: 'Tombstone';
-	formerType?: IObject;
-	deleted?: Date;
-}
-
-export const isLink = (object: IObject): object is ILink => object.type === 'ApLink';
-
-
-
-export function extractType(object: IObject): string {
-	return typeof object.type === 'string' ? object.type : object.type[0];
-}
-
-export function extractId(x: IObject | ApLink): string {
-	const id = typeof x === 'string' ? x : isLink(x) ? x.href : x.id;
-	if (id == null) throw 'no id';
-	return id;
-}
-
-export interface IActor extends IObject {
-	// https://www.w3.org/TR/activitypub/#actor-objects
-	type: 'Person' | 'Service' | 'Organization' | 'Group' | 'Application';
-	inbox: IOrderedCollection | ApLink;
-	outbox: IOrderedCollection | ApLink;
-	following?: IOrderedCollection | ICollection | ApLink;
-	followers?: IOrderedCollection | ICollection | ApLink;
-	preferredUsername?: string;
-	endpoints?: {
-		sharedInbox?: IOrderedCollection | ApLink;
-	};
-
-	// https://docs.joinmastodon.org/spec/activitypub/#public-key
-	publicKey?: {
-		id?: string;
-		owner?: string;
-		publicKeyPem?: string;
-	};
-}
-
+export const isOrderedCollectionPage = (object: IObject): object is IOrderedCollectionPage => object.type === 'OrderedCollectionPage'
