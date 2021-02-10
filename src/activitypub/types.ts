@@ -1,5 +1,5 @@
 //#region Core
-export type obj = { [x: string]: obj };
+type obj = { [x: string]: obj };
 
 /** One or many Object or Link */
 export type JointObject = IObject | Link | (IObject | Link)[];
