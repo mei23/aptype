@@ -419,5 +419,11 @@ export interface IEmoji extends IObject {
 }
 export const isEmoji = (object: IObject): object is IEmoji => extractType(object) === 'Emoji';
 
+export interface IHashtag extends IObject {
+	type: 'Hashtag';
+}
+export const isHashtag = (object: IObject): object is IHashtag => extractType(object) === 'Hashtag';
+
+
 // toot:IdentityProof TODO
 //#endregion
