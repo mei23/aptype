@@ -43,6 +43,7 @@ export interface IPostLike extends IObject {
 	anyOf?: IQuestionChoice[];
 	endTime?: Date;
 	closed?: Date;
+	votersCount?: number;
 }
 
 interface IQuestionChoice {
