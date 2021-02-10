@@ -1,3 +1,6 @@
+// デファクトでまあいけるルーチン
+// 厳密にはLinkをリモート解決する必要があるが、まあしなくても問題ないものたち
+
 import { IEmoji, IHashtag, IObject, isEmoji, isObject, isHashtag } from './types';
 
 /**
@@ -26,10 +29,8 @@ function isNonNull<T>(x: T | null | undefined): x is T {
 
 /**
  * オブジェクトからカスタム絵文字を取得して { name: ':name:', url '...' }[] みたいにします
- * @param object 
  */
 export function extractEmojis(object: IObject): { name: string, url: string }[] {
-	// type: 'Emoji' でresolveが必要ない場合のみEmojiとして認識 or null
 	const toEmoji = (x: IEmoji) => {
 		if (x.name != null && isObject(x.icon) && typeof x.icon?.url === 'string') {
 			return {
@@ -58,3 +59,4 @@ export function extractHashTags(object: IObject): string[] {
 
 	return toArray(object.tag).filter(isObject).filter(isHashtag).map(toHashtag).filter(isNonNull);
 }
+
