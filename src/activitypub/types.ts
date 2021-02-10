@@ -183,6 +183,7 @@ export interface ILeave extends IActivity {
 export const isLeave = (activity: IActivity): activity is ILeave => activity.type === 'Leave';
 
 export interface ILike extends IActivity {
+	type: 'Like';
 	_misskey_reaction?: string;
 }
 export const isLike = (activity: IActivity): activity is ILike => activity.type === 'Like';
