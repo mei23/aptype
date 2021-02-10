@@ -1,4 +1,4 @@
-import { IObject, isObject, Link } from './types';
+import { IObject, isObject } from './types';
 
 function toArray<T>(x: T | T[] | null | undefined): T[] {
 	if (x == null) return [];
