@@ -34,7 +34,7 @@ export interface IObject {
 	mediaType?: string;
 	duration?: string;
 }
-export const isObject = (object: IObject | Link): object is IObject => typeof(object) !== 'string' && getType(object) !== 'Link';
+export const isObject = (object: IObject | Link | null | undefined): object is IObject => object != null && typeof(object) !== 'string' && extractType(object) !== 'Link';
 
 interface ILinkBase {
 	href: string;
@@ -59,11 +59,11 @@ interface IMention extends ILinkBase {
 
 export type Mention = IMention | string;
 
-export const getType = (object: IObject): string => {
+export const extractType = (object: IObject): string => {
 	return Array.isArray(object.type) ? object.type[0] : object.type;
 }
 
-export const getId = (object: IObject | Link): string => {
+export const extractId = (object: IObject | Link): string => {
 	const id = typeof object === 'string' ? object : isObject(object) ? object.id : object.href;
 	if (id == null) throw 'no id';
 	return id;
@@ -197,7 +197,7 @@ export interface ILikeLike extends IActivity {
 	 * */
 	_misskey_reaction?: string;
 }
-export const isLikeLike = (activity: IActivity): activity is ILikeLike => ['Like', 'Dislike', 'EmojiReaction', 'EmojiReact'].includes(getType(activity));
+export const isLikeLike = (activity: IActivity): activity is ILikeLike => ['Like', 'Dislike', 'EmojiReaction', 'EmojiReact'].includes(extractType(activity));
 
 export interface IOffer extends IActivity {
 	type: 'Offer';
@@ -325,7 +325,7 @@ export interface IActor extends IObject {
 	suspended?: boolean;
 }
 export const validActors = Object.freeze(['Application', 'Group', 'Organization', 'Person', 'Service']);
-export const isActor = (object: IObject): object is IActor =>  validActors.includes(getType(object));
+export const isActor = (object: IObject): object is IActor =>  validActors.includes(extractType(object));
 //#endregion
 
 //#region Object
@@ -335,7 +335,7 @@ export interface IRelationship extends IObject {
 	object?: JointObject;
 	relationship?: IObject;
 }
-export const isRelationship = (object: IObject): object is IRelationship => getType(object) === 'Relationship';
+export const isRelationship = (object: IObject): object is IRelationship => extractType(object) === 'Relationship';
 
 export interface IDocumentLike extends IObject {
 	type: 'Document' | 'Audio' | 'Image' | 'Video' | 'Page';
@@ -348,7 +348,7 @@ export interface IDocumentLike extends IObject {
 	focalPoint?: number[];
 }
 export const validDocuments = Object.freeze(['Document', 'Audio', 'Image', 'Video', 'Page']);
-export const isDocumentLike = (object: IObject): object is IDocumentLike => validDocuments.includes(getType(object));
+export const isDocumentLike = (object: IObject): object is IDocumentLike => validDocuments.includes(extractType(object));
 
 export interface IPostLike extends IObject {
 	type: 'Article' | 'Note' | 'Event' | 'Question';
@@ -384,7 +384,7 @@ interface IQuestionChoice {
 	// 3
 }
 export const validPosts = Object.freeze(['Article', 'Note', 'Event']);
-export const isPostLike = (object: IObject): object is IPostLike => validPosts.includes(getType(object));
+export const isPostLike = (object: IObject): object is IPostLike => validPosts.includes(extractType(object));
 
 export interface IPlace extends IObject {
 	type: 'Place';
@@ -395,29 +395,29 @@ export interface IPlace extends IObject {
 	/** units of altitude */
 	units?: 'cm' | 'feet' | 'inches' | 'km' | 'm' | 'miles';
 }
-export const isPlace = (object: IObject): object is IPlace => getType(object) === 'Place';
+export const isPlace = (object: IObject): object is IPlace => extractType(object) === 'Place';
 
 export interface IProfile extends IObject {
 	type: 'Profile';
 	describes?: IObject;
 }
-export const isProfile = (object: IObject): object is IProfile => getType(object) === 'Profile';
+export const isProfile = (object: IObject): object is IProfile => extractType(object) === 'Profile';
 
 export interface ITombstone extends IObject {
 	type: 'Tombstone';
 	formerType?: IObject;
 	deleted?: Date;
 }
-export const isTombstone = (object: IObject): object is ITombstone => getType(object) === 'Tombstone';
+export const isTombstone = (object: IObject): object is ITombstone => extractType(object) === 'Tombstone';
 
 // https://docs.joinmastodon.org/spec/activitypub/#emoji
 export interface IEmoji extends IObject {
 	type: 'Emoji';
 	// Objectから継承されている以下を使う
 	// name: ':name:'
-	// icon: Image
+	// icon: IDocumentLike
 }
-export const isEmoji = (object: IObject): object is IEmoji => getType(object) === 'Emoji';
+export const isEmoji = (object: IObject): object is IEmoji => extractType(object) === 'Emoji';
 
 // toot:IdentityProof TODO
 //#endregion
