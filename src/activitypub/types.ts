@@ -63,8 +63,12 @@ export const extractType = (object: IObject): string => {
 	return Array.isArray(object.type) ? object.type[0] : object.type;
 }
 
+export const extractIdNullable = (object: IObject | Link | null | undefined): string | null | undefined => {
+	return object == null ? object : typeof object === 'string' ? object : isObject(object) ? object.id : object.href;
+}
+
 export const extractId = (object: IObject | Link): string => {
-	const id = typeof object === 'string' ? object : isObject(object) ? object.id : object.href;
+	const id = extractIdNullable(object);
 	if (id == null) throw 'no id';
 	return id;
 }
@@ -410,12 +414,22 @@ export interface ITombstone extends IObject {
 }
 export const isTombstone = (object: IObject): object is ITombstone => extractType(object) === 'Tombstone';
 
-// https://docs.joinmastodon.org/spec/activitypub/#emoji
+/**
+ * カスタム絵文字情報
+ * https://docs.joinmastodon.org/spec/activitypub/#emoji
+ * MastodonのものですがMisskey/Pleroma等でも使用できます
+ */
 export interface IEmoji extends IObject {
 	type: 'Emoji';
-	// Objectから継承されている以下を使う
-	// name: ':name:'
-	// icon: IDocumentLike
+	
+	/** Objectから継承されたこれで、おそらく :name: 形式で絵文字名が提供されています */
+	name?: string;
+
+	/** Objectから継承されたこれで、おそらく絵文字ファイルの情報が提供されています。urlプロパティを参照すると良いです。 */
+	icon?: IDocumentLike;
+
+	/** Objectから継承されたこれで、おそらく最終更新日時が提供されています。 */
+	updated?: Date;
 }
 export const isEmoji = (object: IObject): object is IEmoji => extractType(object) === 'Emoji';
 
