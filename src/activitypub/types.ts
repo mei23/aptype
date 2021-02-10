@@ -369,13 +369,19 @@ export interface IPostLike extends IObject {
 	anyOf?: IQuestionChoice[];
 	endTime?: Date;
 	closed?: Date;
+	/** Mastodon: total voters count (not an votes) */
 	votersCount?: number;
 }
 
 interface IQuestionChoice {
 	name?: string;
+	// 'Choice 1'
+
 	replies?: ICollection;
+	// { type: 'Collection', totalItems: 3 }
+
 	_misskey_votes?: number;
+	// 3
 }
 export const validPosts = Object.freeze(['Article', 'Note', 'Event']);
 export const isPostLike = (object: IObject): object is IPostLike => validPosts.includes(getType(object));
